@@ -55,7 +55,8 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
   const pathname = usePathname();
   const profileRef = useRef<HTMLDivElement>(null);
   const [unread, setUnread] = useState(0);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [profileMenu, setProfileMenu] = useState({ pathname: "", open: false });
+  const profileOpen = profileMenu.pathname === pathname && profileMenu.open;
   const nav = user.role === "BUSINESS" ? businessNav : user.role === "NGO" ? ngoNav : adminNav;
   const quickAction = user.role === "BUSINESS"
     ? { href: "/donations/new", label: "New donation", icon: PlusCircle }
@@ -81,14 +82,12 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
     return () => { active = false; clearInterval(timer); };
   }, []);
 
-  useEffect(() => setProfileOpen(false), [pathname]);
-
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) setProfileOpen(false);
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) setProfileMenu({ pathname, open: false });
     }
     function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setProfileOpen(false);
+      if (event.key === "Escape") setProfileMenu({ pathname, open: false });
     }
     document.addEventListener("mousedown", closeOnOutsideClick);
     document.addEventListener("keydown", closeOnEscape);
@@ -96,7 +95,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
       document.removeEventListener("mousedown", closeOnOutsideClick);
       document.removeEventListener("keydown", closeOnEscape);
     };
-  }, []);
+  }, [pathname]);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
@@ -160,7 +159,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
           <div ref={profileRef} className="relative">
             <button
               type="button"
-              onClick={() => setProfileOpen((open) => !open)}
+              onClick={() => setProfileMenu({ pathname, open: !profileOpen })}
               aria-expanded={profileOpen}
               aria-haspopup="menu"
               title="Open account menu"
@@ -195,10 +194,10 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
           const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
           return <Link key={href} href={href} title={label} aria-current={active ? "page" : undefined} className={`flex min-w-14 flex-col items-center gap-1 rounded-lg px-1 py-1.5 text-[9px] font-bold ${active ? "bg-[#123b2b] text-[#63dfa5]" : "text-[#71877c]"}`}><Icon size={19}/><span className="max-w-14 truncate">{label.split(" ")[0]}</span></Link>;
         })}
-        <button type="button" title="Open account menu" onClick={() => setProfileOpen(true)} className="flex min-w-14 flex-col items-center gap-1 rounded-lg px-1 py-1.5 text-[9px] font-bold text-[#71877c]"><span className="grid size-5 place-items-center rounded bg-[#173d2d] text-[8px] text-[#63dfa5]">{initials(user.name)}</span><span>Profile</span></button>
+        <button type="button" title="Open account menu" onClick={() => setProfileMenu({ pathname, open: true })} className="flex min-w-14 flex-col items-center gap-1 rounded-lg px-1 py-1.5 text-[9px] font-bold text-[#71877c]"><span className="grid size-5 place-items-center rounded bg-[#173d2d] text-[8px] text-[#63dfa5]">{initials(user.name)}</span><span>Profile</span></button>
       </nav>
 
-      {profileOpen && <button type="button" aria-label="Close account menu" onClick={() => setProfileOpen(false)} className="fixed inset-0 z-10 hidden bg-black/20 md:block"><X className="sr-only"/></button>}
+      {profileOpen && <button type="button" aria-label="Close account menu" onClick={() => setProfileMenu({ pathname, open: false })} className="fixed inset-0 z-10 hidden bg-black/20 md:block"><X className="sr-only"/></button>}
     </div>
   </div>;
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ArrowRight, Building2, HeartHandshake, Leaf, LoaderCircle, LockKeyhole } from "lucide-react";
 
 const demos = [
@@ -11,19 +12,16 @@ const demos = [
 ] as const;
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("donor@foodrescue.demo");
+  return <Suspense fallback={<main className="grid min-h-screen place-items-center bg-[var(--cream)] text-sm text-[#65726c]">Loading sign in…</main>}><LoginForm /></Suspense>;
+}
+
+function LoginForm() {
+  const requestedRole = useSearchParams().get("demo")?.toLowerCase();
+  const requestedDemo = demos.find((demo) => demo.key === requestedRole);
+  const [email, setEmail] = useState<string>(requestedDemo?.email ?? demos[0].email);
   const [password, setPassword] = useState("Demo@123");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
-
-  useEffect(() => {
-    const requestedRole = new URLSearchParams(window.location.search).get("demo")?.toLowerCase();
-    const selected = demos.find((demo) => demo.key === requestedRole);
-    if (selected) {
-      setEmail(selected.email);
-      setPassword("Demo@123");
-    }
-  }, []);
 
   async function signIn(loginEmail: string, loginPassword: string, loadingKey: string) {
     setLoading(loadingKey);

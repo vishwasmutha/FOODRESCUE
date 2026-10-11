@@ -81,7 +81,10 @@ export default function RequirementsPage() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
 
   const analyze = useCallback(async (source: string, automatic = false) => {
     if (source.trim().length < 10) return;

@@ -3,6 +3,8 @@ node_modules/
 out/
 build/
 coverage/
+*.tsbuildinfo
+artifacts/
 
 .env*
 !.env.example
