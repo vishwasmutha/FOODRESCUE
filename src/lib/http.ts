@@ -33,9 +33,36 @@ export function requireNumber(value: unknown, label: string, min = 0, max = 100_
   return number;
 }
 
+function getErrorCode(error: unknown, seen = new Set<object>()): string | undefined {
+  if (!error || typeof error !== "object" || seen.has(error)) return undefined;
+  seen.add(error);
+  if ("code" in error && typeof error.code === "string") return error.code;
+  if ("cause" in error) {
+    const causeCode = getErrorCode(error.cause, seen);
+    if (causeCode) return causeCode;
+  }
+  if ("errors" in error && Array.isArray(error.errors)) {
+    for (const nestedError of error.errors) {
+      const nestedCode = getErrorCode(nestedError, seen);
+      if (nestedCode) return nestedCode;
+    }
+  }
+  return undefined;
+}
+
 export function apiErrorResponse(error: unknown) {
   if (error instanceof ApiError) return Response.json({ error: error.message, details: error.details ?? null }, { status: error.status });
   if (error instanceof AuthError) return Response.json({ error: error.message }, { status: error.status });
+  const errorCode = getErrorCode(error);
+  if (typeof errorCode === "string" && ["ECONNREFUSED", "ENOTFOUND", "ETIMEDOUT", "EHOSTUNREACH"].includes(errorCode)) {
+    return Response.json({ error: "Database unavailable. Start PostgreSQL and verify DATABASE_URL in .env.local." }, { status: 503 });
+  }
+  if (errorCode === "3D000") {
+    return Response.json({ error: "The configured PostgreSQL database does not exist. Create it and run npx drizzle-kit push." }, { status: 503 });
+  }
+  if (errorCode === "28P01") {
+    return Response.json({ error: "PostgreSQL rejected the configured credentials. Check DATABASE_URL in .env.local." }, { status: 503 });
+  }
   if (error instanceof Error && /unique|duplicate/i.test(error.message)) return Response.json({ error: "This record already exists" }, { status: 409 });
   console.error(error);
   return Response.json({ error: "An unexpected server error occurred" }, { status: 500 });
