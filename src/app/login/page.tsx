@@ -34,7 +34,9 @@ function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword }),
       });
-      const result = await response.json().catch(() => ({ error: "The server returned an invalid response" }));
+      const result = await response.json().catch(() => ({
+        error: `The server returned HTTP ${response.status} without JSON. Check the terminal and verify PostgreSQL is running and DATABASE_URL is set in .env.local.`,
+      }));
       if (!response.ok) throw new Error(result.error ?? "Unable to sign in");
 
       // A full navigation guarantees the newly issued HTTP-only session cookie is
