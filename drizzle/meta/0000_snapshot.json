@@ -1,0 +1,3015 @@
+{
+  "id": "93204fbf-86b9-473b-99fb-a0c86b15837e",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.actual_surplus": {
+      "name": "actual_surplus",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "prediction_id": {
+          "name": "prediction_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "business_id": {
+          "name": "business_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observation_date": {
+          "name": "observation_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actual_surplus_kg": {
+          "name": "actual_surplus_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "safe_donation_kg": {
+          "name": "safe_donation_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "actual_surplus_unique": {
+          "name": "actual_surplus_unique",
+          "columns": [
+            {
+              "expression": "business_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "observation_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "actual_surplus_prediction_id_surplus_predictions_id_fk": {
+          "name": "actual_surplus_prediction_id_surplus_predictions_id_fk",
+          "tableFrom": "actual_surplus",
+          "tableTo": "surplus_predictions",
+          "columnsFrom": [
+            "prediction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "actual_surplus_business_id_businesses_id_fk": {
+          "name": "actual_surplus_business_id_businesses_id_fk",
+          "tableFrom": "actual_surplus",
+          "tableTo": "businesses",
+          "columnsFrom": [
+            "business_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "actual_surplus_category_id_food_categories_id_fk": {
+          "name": "actual_surplus_category_id_food_categories_id_fk",
+          "tableFrom": "actual_surplus",
+          "tableTo": "food_categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.audit_logs": {
+      "name": "audit_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "actor_id": {
+          "name": "actor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action": {
+          "name": "action",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_type": {
+          "name": "entity_type",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "details": {
+          "name": "details",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "audit_entity_idx": {
+          "name": "audit_entity_idx",
+          "columns": [
+            {
+              "expression": "entity_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entity_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "audit_created_idx": {
+          "name": "audit_created_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "audit_logs_actor_id_users_id_fk": {
+          "name": "audit_logs_actor_id_users_id_fk",
+          "tableFrom": "audit_logs",
+          "tableTo": "users",
+          "columnsFrom": [
+            "actor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.businesses": {
+      "name": "businesses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(180)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "business_type": {
+          "name": "business_type",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Bengaluru'"
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verification_status": {
+          "name": "verification_status",
+          "type": "verification_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        },
+        "default_pickup_notes": {
+          "name": "default_pickup_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "businesses_verification_idx": {
+          "name": "businesses_verification_idx",
+          "columns": [
+            {
+              "expression": "verification_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "businesses_owner_id_users_id_fk": {
+          "name": "businesses_owner_id_users_id_fk",
+          "tableFrom": "businesses",
+          "tableTo": "users",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "businesses_owner_id_unique": {
+          "name": "businesses_owner_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "owner_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.donation_items": {
+      "name": "donation_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "donation_id": {
+          "name": "donation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(180)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity_kg": {
+          "name": "quantity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dietary_tags": {
+          "name": "dietary_tags",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "ARRAY[]::text[]"
+        },
+        "allergen_notes": {
+          "name": "allergen_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "donation_items_donation_idx": {
+          "name": "donation_items_donation_idx",
+          "columns": [
+            {
+              "expression": "donation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "donation_items_donation_id_donations_id_fk": {
+          "name": "donation_items_donation_id_donations_id_fk",
+          "tableFrom": "donation_items",
+          "tableTo": "donations",
+          "columnsFrom": [
+            "donation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "donation_items_category_id_food_categories_id_fk": {
+          "name": "donation_items_category_id_food_categories_id_fk",
+          "tableFrom": "donation_items",
+          "tableTo": "food_categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "donation_item_quantity_positive": {
+          "name": "donation_item_quantity_positive",
+          "value": "\"donation_items\".\"quantity_kg\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.donation_offers": {
+      "name": "donation_offers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "donation_id": {
+          "name": "donation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ngo_id": {
+          "name": "ngo_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "offered_quantity_kg": {
+          "name": "offered_quantity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "offer_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        },
+        "match_score": {
+          "name": "match_score",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score_breakdown": {
+          "name": "score_breakdown",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "recommendation_reason": {
+          "name": "recommendation_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "idempotency_key": {
+          "name": "idempotency_key",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "responded_at": {
+          "name": "responded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "offer_donation_ngo_unique": {
+          "name": "offer_donation_ngo_unique",
+          "columns": [
+            {
+              "expression": "donation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "ngo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "offer_idempotency_unique": {
+          "name": "offer_idempotency_unique",
+          "columns": [
+            {
+              "expression": "idempotency_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "offers_ngo_status_idx": {
+          "name": "offers_ngo_status_idx",
+          "columns": [
+            {
+              "expression": "ngo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "donation_offers_donation_id_donations_id_fk": {
+          "name": "donation_offers_donation_id_donations_id_fk",
+          "tableFrom": "donation_offers",
+          "tableTo": "donations",
+          "columnsFrom": [
+            "donation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "donation_offers_ngo_id_ngos_id_fk": {
+          "name": "donation_offers_ngo_id_ngos_id_fk",
+          "tableFrom": "donation_offers",
+          "tableTo": "ngos",
+          "columnsFrom": [
+            "ngo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "offer_quantity_positive": {
+          "name": "offer_quantity_positive",
+          "value": "\"donation_offers\".\"offered_quantity_kg\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.donations": {
+      "name": "donations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "public_id": {
+          "name": "public_id",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "business_id": {
+          "name": "business_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prediction_id": {
+          "name": "prediction_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(180)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "extracted_data": {
+          "name": "extracted_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "status": {
+          "name": "status",
+          "type": "donation_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DRAFT'"
+        },
+        "urgency": {
+          "name": "urgency",
+          "type": "urgency_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'MANUAL_REVIEW'"
+        },
+        "total_quantity_kg": {
+          "name": "total_quantity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reserved_quantity_kg": {
+          "name": "reserved_quantity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "completed_quantity_kg": {
+          "name": "completed_quantity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "available_from": {
+          "name": "available_from",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pickup_deadline": {
+          "name": "pickup_deadline",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "preparation_time": {
+          "name": "preparation_time",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "storage_condition": {
+          "name": "storage_condition",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "packaging_condition": {
+          "name": "packaging_condition",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dietary_tags": {
+          "name": "dietary_tags",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "ARRAY[]::text[]"
+        },
+        "safety_reviewed": {
+          "name": "safety_reviewed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "safety_notes": {
+          "name": "safety_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "donations_status_deadline_idx": {
+          "name": "donations_status_deadline_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "pickup_deadline",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "donations_business_idx": {
+          "name": "donations_business_idx",
+          "columns": [
+            {
+              "expression": "business_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "donations_business_id_businesses_id_fk": {
+          "name": "donations_business_id_businesses_id_fk",
+          "tableFrom": "donations",
+          "tableTo": "businesses",
+          "columnsFrom": [
+            "business_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "donations_prediction_id_surplus_predictions_id_fk": {
+          "name": "donations_prediction_id_surplus_predictions_id_fk",
+          "tableFrom": "donations",
+          "tableTo": "surplus_predictions",
+          "columnsFrom": [
+            "prediction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "donations_public_id_unique": {
+          "name": "donations_public_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "public_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "donation_quantity_valid": {
+          "name": "donation_quantity_valid",
+          "value": "\"donations\".\"total_quantity_kg\" > 0 AND \"donations\".\"reserved_quantity_kg\" >= 0 AND \"donations\".\"completed_quantity_kg\" >= 0 AND \"donations\".\"reserved_quantity_kg\" <= \"donations\".\"total_quantity_kg\" AND \"donations\".\"completed_quantity_kg\" <= \"donations\".\"total_quantity_kg\""
+        },
+        "donation_window_valid": {
+          "name": "donation_window_valid",
+          "value": "\"donations\".\"pickup_deadline\" > \"donations\".\"available_from\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.food_categories": {
+      "name": "food_categories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "default_handling_notes": {
+          "name": "default_handling_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "food_categories_name_unique": {
+          "name": "food_categories_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        },
+        "food_categories_slug_unique": {
+          "name": "food_categories_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.model_evaluations": {
+      "name": "model_evaluations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "model_version_id": {
+          "name": "model_version_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "split_strategy": {
+          "name": "split_strategy",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evaluated_samples": {
+          "name": "evaluated_samples",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mae": {
+          "name": "mae",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rmse": {
+          "name": "rmse",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "baseline_mae": {
+          "name": "baseline_mae",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "baseline_rmse": {
+          "name": "baseline_rmse",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metrics": {
+          "name": "metrics",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "evaluated_at": {
+          "name": "evaluated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "model_evaluations_version_idx": {
+          "name": "model_evaluations_version_idx",
+          "columns": [
+            {
+              "expression": "model_version_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "model_evaluations_model_version_id_model_versions_id_fk": {
+          "name": "model_evaluations_model_version_id_model_versions_id_fk",
+          "tableFrom": "model_evaluations",
+          "tableTo": "model_versions",
+          "columnsFrom": [
+            "model_version_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.model_versions": {
+      "name": "model_versions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(140)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model_type": {
+          "name": "model_type",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'VALIDATED_DEMO'"
+        },
+        "training_source": {
+          "name": "training_source",
+          "type": "data_source",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'SYNTHETIC'"
+        },
+        "feature_schema": {
+          "name": "feature_schema",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "training_metadata": {
+          "name": "training_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "artifact_path": {
+          "name": "artifact_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "trained_at": {
+          "name": "trained_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "model_name_version_unique": {
+          "name": "model_name_version_unique",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ngo_accepted_categories": {
+      "name": "ngo_accepted_categories",
+      "schema": "",
+      "columns": {
+        "ngo_id": {
+          "name": "ngo_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "priority": {
+          "name": "priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ngo_accepted_categories_ngo_id_ngos_id_fk": {
+          "name": "ngo_accepted_categories_ngo_id_ngos_id_fk",
+          "tableFrom": "ngo_accepted_categories",
+          "tableTo": "ngos",
+          "columnsFrom": [
+            "ngo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ngo_accepted_categories_category_id_food_categories_id_fk": {
+          "name": "ngo_accepted_categories_category_id_food_categories_id_fk",
+          "tableFrom": "ngo_accepted_categories",
+          "tableTo": "food_categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ngo_accepted_categories_ngo_id_category_id_pk": {
+          "name": "ngo_accepted_categories_ngo_id_category_id_pk",
+          "columns": [
+            "ngo_id",
+            "category_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ngo_operating_hours": {
+      "name": "ngo_operating_hours",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "ngo_id": {
+          "name": "ngo_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day_of_week": {
+          "name": "day_of_week",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opens_at": {
+          "name": "opens_at",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "closes_at": {
+          "name": "closes_at",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pickup_available": {
+          "name": "pickup_available",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {
+        "ngo_hours_lookup_idx": {
+          "name": "ngo_hours_lookup_idx",
+          "columns": [
+            {
+              "expression": "ngo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "day_of_week",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ngo_operating_hours_ngo_id_ngos_id_fk": {
+          "name": "ngo_operating_hours_ngo_id_ngos_id_fk",
+          "tableFrom": "ngo_operating_hours",
+          "tableTo": "ngos",
+          "columnsFrom": [
+            "ngo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "valid_day_of_week": {
+          "name": "valid_day_of_week",
+          "value": "\"ngo_operating_hours\".\"day_of_week\" BETWEEN 0 AND 6"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.ngos": {
+      "name": "ngos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(180)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "registration_number": {
+          "name": "registration_number",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requirements_text": {
+          "name": "requirements_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Bengaluru'"
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "max_capacity_kg": {
+          "name": "max_capacity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 25
+        },
+        "current_capacity_kg": {
+          "name": "current_capacity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 25
+        },
+        "max_travel_distance_km": {
+          "name": "max_travel_distance_km",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 12
+        },
+        "min_remaining_shelf_life_minutes": {
+          "name": "min_remaining_shelf_life_minutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 60
+        },
+        "has_transport": {
+          "name": "has_transport",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "accepts_partial": {
+          "name": "accepts_partial",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "storage_capabilities": {
+          "name": "storage_capabilities",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "ARRAY['AMBIENT']::text[]"
+        },
+        "dietary_preferences": {
+          "name": "dietary_preferences",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "ARRAY['VEGETARIAN']::text[]"
+        },
+        "verification_status": {
+          "name": "verification_status",
+          "type": "verification_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ngos_verification_idx": {
+          "name": "ngos_verification_idx",
+          "columns": [
+            {
+              "expression": "verification_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ngos_location_idx": {
+          "name": "ngos_location_idx",
+          "columns": [
+            {
+              "expression": "city",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ngos_owner_id_users_id_fk": {
+          "name": "ngos_owner_id_users_id_fk",
+          "tableFrom": "ngos",
+          "tableTo": "users",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ngos_owner_id_unique": {
+          "name": "ngos_owner_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "owner_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "ngos_capacity_nonnegative": {
+          "name": "ngos_capacity_nonnegative",
+          "value": "\"ngos\".\"current_capacity_kg\" >= 0 AND \"ngos\".\"max_capacity_kg\" >= \"ngos\".\"current_capacity_kg\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.notifications": {
+      "name": "notifications",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(180)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action_url": {
+          "name": "action_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "notification_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DELIVERED'"
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "delivered_at": {
+          "name": "delivered_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "read_at": {
+          "name": "read_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "notifications_user_status_idx": {
+          "name": "notifications_user_status_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "notifications_user_id_users_id_fk": {
+          "name": "notifications_user_id_users_id_fk",
+          "tableFrom": "notifications",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.offer_responses": {
+      "name": "offer_responses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "offer_id": {
+          "name": "offer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responder_id": {
+          "name": "responder_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action": {
+          "name": "action",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "requested_quantity_kg": {
+          "name": "requested_quantity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "offer_responses_offer_idx": {
+          "name": "offer_responses_offer_idx",
+          "columns": [
+            {
+              "expression": "offer_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "offer_responses_offer_id_donation_offers_id_fk": {
+          "name": "offer_responses_offer_id_donation_offers_id_fk",
+          "tableFrom": "offer_responses",
+          "tableTo": "donation_offers",
+          "columnsFrom": [
+            "offer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "offer_responses_responder_id_users_id_fk": {
+          "name": "offer_responses_responder_id_users_id_fk",
+          "tableFrom": "offer_responses",
+          "tableTo": "users",
+          "columnsFrom": [
+            "responder_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pickup_records": {
+      "name": "pickup_records",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "reservation_id": {
+          "name": "reservation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "pickup_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'SCHEDULED'"
+        },
+        "scheduled_at": {
+          "name": "scheduled_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "handover_at": {
+          "name": "handover_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "received_at": {
+          "name": "received_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "handed_over_quantity_kg": {
+          "name": "handed_over_quantity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "donor_confirmation_code": {
+          "name": "donor_confirmation_code",
+          "type": "varchar(12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recipient_confirmation_code": {
+          "name": "recipient_confirmation_code",
+          "type": "varchar(12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "pickups_status_idx": {
+          "name": "pickups_status_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pickup_records_reservation_id_reservations_id_fk": {
+          "name": "pickup_records_reservation_id_reservations_id_fk",
+          "tableFrom": "pickup_records",
+          "tableTo": "reservations",
+          "columnsFrom": [
+            "reservation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "pickup_records_reservation_id_unique": {
+          "name": "pickup_records_reservation_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "reservation_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.reservations": {
+      "name": "reservations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "offer_id": {
+          "name": "offer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "donation_id": {
+          "name": "donation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ngo_id": {
+          "name": "ngo_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity_kg": {
+          "name": "quantity_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "reservation_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ACTIVE'"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "reservations_donation_status_idx": {
+          "name": "reservations_donation_status_idx",
+          "columns": [
+            {
+              "expression": "donation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "reservations_offer_id_donation_offers_id_fk": {
+          "name": "reservations_offer_id_donation_offers_id_fk",
+          "tableFrom": "reservations",
+          "tableTo": "donation_offers",
+          "columnsFrom": [
+            "offer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reservations_donation_id_donations_id_fk": {
+          "name": "reservations_donation_id_donations_id_fk",
+          "tableFrom": "reservations",
+          "tableTo": "donations",
+          "columnsFrom": [
+            "donation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reservations_ngo_id_ngos_id_fk": {
+          "name": "reservations_ngo_id_ngos_id_fk",
+          "tableFrom": "reservations",
+          "tableTo": "ngos",
+          "columnsFrom": [
+            "ngo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "reservations_offer_id_unique": {
+          "name": "reservations_offer_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "offer_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "reservation_quantity_positive": {
+          "name": "reservation_quantity_positive",
+          "value": "\"reservations\".\"quantity_kg\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.sales_history": {
+      "name": "sales_history",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "business_id": {
+          "name": "business_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "business_date": {
+          "name": "business_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prepared_kg": {
+          "name": "prepared_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sold_kg": {
+          "name": "sold_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leftover_kg": {
+          "name": "leftover_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "safe_donation_kg": {
+          "name": "safe_donation_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "order_count": {
+          "name": "order_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reservations": {
+          "name": "reservations",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "discount_percent": {
+          "name": "discount_percent",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "promotion_active": {
+          "name": "promotion_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "holiday_or_festival": {
+          "name": "holiday_or_festival",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weather_summary": {
+          "name": "weather_summary",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source": {
+          "name": "source",
+          "type": "data_source",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'USER_ENTERED'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "sales_business_category_date_unique": {
+          "name": "sales_business_category_date_unique",
+          "columns": [
+            {
+              "expression": "business_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "business_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "sales_chronological_idx": {
+          "name": "sales_chronological_idx",
+          "columns": [
+            {
+              "expression": "business_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "business_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "sales_history_business_id_businesses_id_fk": {
+          "name": "sales_history_business_id_businesses_id_fk",
+          "tableFrom": "sales_history",
+          "tableTo": "businesses",
+          "columnsFrom": [
+            "business_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "sales_history_category_id_food_categories_id_fk": {
+          "name": "sales_history_category_id_food_categories_id_fk",
+          "tableFrom": "sales_history",
+          "tableTo": "food_categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "sales_quantities_nonnegative": {
+          "name": "sales_quantities_nonnegative",
+          "value": "\"sales_history\".\"prepared_kg\" >= 0 AND \"sales_history\".\"sold_kg\" >= 0 AND \"sales_history\".\"leftover_kg\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.sessions": {
+      "name": "sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "sessions_user_idx": {
+          "name": "sessions_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "sessions_expiry_idx": {
+          "name": "sessions_expiry_idx",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sessions_token_hash_unique": {
+          "name": "sessions_token_hash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token_hash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.surplus_predictions": {
+      "name": "surplus_predictions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "business_id": {
+          "name": "business_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model_version_id": {
+          "name": "model_version_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "forecast_date": {
+          "name": "forecast_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "predicted_prepared_kg": {
+          "name": "predicted_prepared_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "predicted_demand_kg": {
+          "name": "predicted_demand_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "predicted_surplus_kg": {
+          "name": "predicted_surplus_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lower_bound_kg": {
+          "name": "lower_bound_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "upper_bound_kg": {
+          "name": "upper_bound_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "important_factors": {
+          "name": "important_factors",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "is_fallback": {
+          "name": "is_fallback",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "source": {
+          "name": "source",
+          "type": "data_source",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'MODEL'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "prediction_unique": {
+          "name": "prediction_unique",
+          "columns": [
+            {
+              "expression": "business_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "forecast_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "prediction_date_idx": {
+          "name": "prediction_date_idx",
+          "columns": [
+            {
+              "expression": "forecast_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "surplus_predictions_business_id_businesses_id_fk": {
+          "name": "surplus_predictions_business_id_businesses_id_fk",
+          "tableFrom": "surplus_predictions",
+          "tableTo": "businesses",
+          "columnsFrom": [
+            "business_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "surplus_predictions_category_id_food_categories_id_fk": {
+          "name": "surplus_predictions_category_id_food_categories_id_fk",
+          "tableFrom": "surplus_predictions",
+          "tableTo": "food_categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "surplus_predictions_model_version_id_model_versions_id_fk": {
+          "name": "surplus_predictions_model_version_id_model_versions_id_fk",
+          "tableFrom": "surplus_predictions",
+          "tableTo": "model_versions",
+          "columnsFrom": [
+            "model_version_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.system_settings": {
+      "name": "system_settings",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "varchar(120)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "system_settings_updated_by_users_id_fk": {
+          "name": "system_settings_updated_by_users_id_fk",
+          "tableFrom": "system_settings",
+          "tableTo": "users",
+          "columnsFrom": [
+            "updated_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_feedback": {
+      "name": "user_feedback",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "donation_id": {
+          "name": "donation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prediction_id": {
+          "name": "prediction_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating": {
+          "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comments": {
+          "name": "comments",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "feedback_type_idx": {
+          "name": "feedback_type_idx",
+          "columns": [
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "user_feedback_user_id_users_id_fk": {
+          "name": "user_feedback_user_id_users_id_fk",
+          "tableFrom": "user_feedback",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "user_feedback_donation_id_donations_id_fk": {
+          "name": "user_feedback_donation_id_donations_id_fk",
+          "tableFrom": "user_feedback",
+          "tableTo": "donations",
+          "columnsFrom": [
+            "donation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "user_feedback_prediction_id_surplus_predictions_id_fk": {
+          "name": "user_feedback_prediction_id_surplus_predictions_id_fk",
+          "tableFrom": "user_feedback",
+          "tableTo": "surplus_predictions",
+          "columnsFrom": [
+            "prediction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "feedback_rating_range": {
+          "name": "feedback_rating_range",
+          "value": "\"user_feedback\".\"rating\" IS NULL OR \"user_feedback\".\"rating\" BETWEEN 1 AND 5"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(160)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "user_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Asia/Kolkata'"
+        },
+        "locale": {
+          "name": "locale",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'en-IN'"
+        },
+        "notification_preferences": {
+          "name": "notification_preferences",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"inApp\":true,\"email\":false,\"urgentOnly\":false}'::jsonb"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "columns": [
+            {
+              "expression": "lower(\"email\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "users_role_idx": {
+          "name": "users_role_idx",
+          "columns": [
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.data_source": {
+      "name": "data_source",
+      "schema": "public",
+      "values": [
+        "SYNTHETIC",
+        "USER_ENTERED",
+        "CSV_IMPORT",
+        "MODEL"
+      ]
+    },
+    "public.donation_status": {
+      "name": "donation_status",
+      "schema": "public",
+      "values": [
+        "PREDICTED",
+        "DRAFT",
+        "AVAILABLE",
+        "OFFERED",
+        "ACCEPTED",
+        "PICKUP_IN_PROGRESS",
+        "COMPLETED",
+        "PARTIALLY_COMPLETED",
+        "REJECTED",
+        "CANCELLED",
+        "EXPIRED",
+        "UNSAFE",
+        "FAILED_PICKUP"
+      ]
+    },
+    "public.notification_status": {
+      "name": "notification_status",
+      "schema": "public",
+      "values": [
+        "QUEUED",
+        "DELIVERED",
+        "READ",
+        "FAILED"
+      ]
+    },
+    "public.offer_status": {
+      "name": "offer_status",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "ACCEPTED",
+        "PARTIAL",
+        "REJECTED",
+        "EXPIRED",
+        "CANCELLED"
+      ]
+    },
+    "public.pickup_status": {
+      "name": "pickup_status",
+      "schema": "public",
+      "values": [
+        "SCHEDULED",
+        "IN_PROGRESS",
+        "HANDED_OVER",
+        "RECEIVED",
+        "FAILED",
+        "CANCELLED"
+      ]
+    },
+    "public.reservation_status": {
+      "name": "reservation_status",
+      "schema": "public",
+      "values": [
+        "ACTIVE",
+        "FULFILLED",
+        "RELEASED",
+        "EXPIRED"
+      ]
+    },
+    "public.urgency_status": {
+      "name": "urgency_status",
+      "schema": "public",
+      "values": [
+        "NORMAL",
+        "TIME_SENSITIVE",
+        "URGENT",
+        "EXPIRED",
+        "MANUAL_REVIEW"
+      ]
+    },
+    "public.user_role": {
+      "name": "user_role",
+      "schema": "public",
+      "values": [
+        "BUSINESS",
+        "NGO",
+        "ADMIN"
+      ]
+    },
+    "public.verification_status": {
+      "name": "verification_status",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "VERIFIED",
+        "SUSPENDED"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

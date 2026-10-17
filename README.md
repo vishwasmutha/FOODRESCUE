@@ -33,10 +33,12 @@ The supplied runtime is Next.js App Router + PostgreSQL/Drizzle, so the MVP uses
 npm install
 cp .env.example .env
 # Create app_db, then:
-npx drizzle-kit push
-npx tsx scripts/seed-demo.ts
+npm run db:push    # or apply the SQL in drizzle/ (generated with npm run db:generate)
+npm run db:seed
 npm run dev
 ```
+
+Adjust the port in `DATABASE_URL` to match your PostgreSQL instance. `npm test` runs the core tests and `npm run typecheck` runs the TypeScript check.
 
 Open `http://localhost:3000`. Timestamps are stored in UTC and presented in the India-oriented UI using `Asia/Kolkata`.
 
