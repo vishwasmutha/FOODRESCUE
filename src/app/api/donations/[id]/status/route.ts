@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { businesses, donationOffers, donations, ngos, notifications, pickupRecords, reservations } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 import { apiErrorResponse, ApiError, readJson, requireNumber, requireText, writeAudit } from "@/lib/http";
+import { classifyUrgency } from "@/lib/safety";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -58,6 +59,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       });
       await writeAudit({ actorId: user.id, action: "DONATION_CANCELLED", entityType: "DONATION", entityId: id });
       return Response.json({ status: "CANCELLED" });
+    }
+    if (action === "REVIEW_AND_PUBLISH") {
+      if (user.role !== "BUSINESS" && user.role !== "ADMIN") throw new ApiError("Only the donor or an administrator can review a listing", 403);
+      const current = donationRecord.donation;
+      if (!["DRAFT", "AVAILABLE"].includes(current.status)) throw new ApiError("Only draft or available donations can be reviewed", 409);
+      const safety = classifyUrgency({ pickupDeadline: current.pickupDeadline, storageCondition: current.storageCondition, packagingCondition: current.packagingCondition, safetyReviewed: true });
+      if (!safety.acceptingAllowed) throw new ApiError(safety.reasons.join(" "), 409);
+      const [business] = await db.select().from(businesses).where(eq(businesses.id, current.businessId)).limit(1);
+      await db.update(donations).set({ safetyReviewed: true, status: "AVAILABLE", urgency: safety.urgency, latitude: current.latitude ?? business?.latitude ?? null, longitude: current.longitude ?? business?.longitude ?? null, updatedAt: new Date(), version: sql`${donations.version} + 1` }).where(eq(donations.id, id));
+      await writeAudit({ actorId: user.id, action: "DONATION_REVIEWED_PUBLISHED", entityType: "DONATION", entityId: id, details: { urgency: safety.urgency } });
+      return Response.json({ status: "AVAILABLE", urgency: safety.urgency });
     }
     throw new ApiError("Unsupported status action");
   } catch (error) {

@@ -92,13 +92,21 @@ function minutesFromClock(clock: string) {
 function timingCompatibility(donation: DonationForMatch, ngo: NgoForMatch) {
   const start = minutesFromClock(ngo.pickupWindowStart);
   const end = minutesFromClock(ngo.pickupWindowEnd);
-  const availableIst = new Date(donation.availableFrom.getTime() + 330 * 60_000);
-  const deadlineIst = new Date(donation.pickupDeadline.getTime() + 330 * 60_000);
-  const donationStart = availableIst.getUTCHours() * 60 + availableIst.getUTCMinutes();
-  const donationEnd = deadlineIst.getUTCHours() * 60 + deadlineIst.getUTCMinutes();
-  const overlap = Math.max(0, Math.min(end, donationEnd) - Math.max(start, donationStart));
-  const donationWindow = Math.max(1, donationEnd - donationStart);
-  return Math.min(1, overlap / Math.min(120, donationWindow));
+  // Compare absolute timestamps so windows that cross midnight (IST) still overlap the recipient's hours.
+  const IST_OFFSET_MS = 330 * 60_000;
+  const DAY_MS = 24 * 60 * 60_000;
+  const donationStart = donation.availableFrom.getTime();
+  const donationEnd = donation.pickupDeadline.getTime();
+  const firstIstDay = Math.floor((donationStart + IST_OFFSET_MS) / DAY_MS) * DAY_MS - IST_OFFSET_MS;
+  let overlapMs = 0;
+  for (let offset = 0; offset <= Math.ceil((donationEnd - firstIstDay) / DAY_MS); offset += 1) {
+    const dayStart = firstIstDay + offset * DAY_MS;
+    const windowStart = dayStart + start * 60_000;
+    const windowEnd = dayStart + (end >= 1439 ? 1440 : end) * 60_000;
+    overlapMs += Math.max(0, Math.min(windowEnd, donationEnd) - Math.max(windowStart, donationStart));
+  }
+  const donationWindowMs = Math.max(60_000, donationEnd - donationStart);
+  return Math.min(1, overlapMs / Math.min(120 * 60_000, donationWindowMs));
 }
 
 function normalizedWeights(weights: ScoreWeights) {

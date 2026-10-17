@@ -1,6 +1,8 @@
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { businesses, ngos, users } from "@/db/schema";
 import { createSession, hashPassword } from "@/lib/auth";
+import { approximateLocation } from "@/lib/geo";
 import { apiErrorResponse, ApiError, readJson, requireText, writeAudit } from "@/lib/http";
 
 export async function POST(request: Request) {
@@ -15,13 +17,17 @@ export async function POST(request: Request) {
     if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) throw new ApiError("Password must contain an uppercase letter and a number");
     const organizationName = requireText(body.organizationName, "Organization name", 2, 180);
     const address = requireText(body.address, "Address", 5, 1000);
+    const [taken] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+    if (taken) throw new ApiError("An account with this email already exists", 409);
     const passwordHash = await hashPassword(password);
+    const place = approximateLocation(address);
+    const location = place ? { latitude: place.latitude, longitude: place.longitude, city: place.city } : {};
     const created = await db.transaction(async (tx) => {
       const [user] = await tx.insert(users).values({ name, email, passwordHash, role }).returning();
       if (role === "BUSINESS") {
-        await tx.insert(businesses).values({ ownerId: user.id, name: organizationName, businessType: typeof body.businessType === "string" ? body.businessType.slice(0, 80) : "Food business", address });
+        await tx.insert(businesses).values({ ownerId: user.id, name: organizationName, businessType: typeof body.businessType === "string" ? body.businessType.slice(0, 80) : "Food business", address, ...location });
       } else {
-        await tx.insert(ngos).values({ ownerId: user.id, name: organizationName, address, requirementsText: typeof body.requirementsText === "string" ? body.requirementsText.slice(0, 5000) : null });
+        await tx.insert(ngos).values({ ownerId: user.id, name: organizationName, address, requirementsText: typeof body.requirementsText === "string" ? body.requirementsText.slice(0, 5000) : null, ...location });
       }
       return user;
     });

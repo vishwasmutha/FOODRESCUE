@@ -2,7 +2,13 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { businesses, foodCategories, ngoAcceptedCategories, ngoOperatingHours, ngos, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
+import { approximateLocation } from "@/lib/geo";
 import { apiErrorResponse, ApiError, readJson, requireNumber, requireText, writeAudit } from "@/lib/http";
+
+function geoFields(address: string) {
+  const place = approximateLocation(address);
+  return place ? { latitude: place.latitude, longitude: place.longitude, city: place.city } : {};
+}
 
 export async function GET() {
   try {
@@ -27,12 +33,12 @@ export async function PATCH(request: Request) {
     const body = await readJson<Record<string, unknown>>(request);
     if (typeof body.name === "string") await db.update(users).set({ name: requireText(body.name, "Name", 2, 160), updatedAt: new Date() }).where(eq(users.id, user.id));
     if (user.role === "BUSINESS") {
-      const [organization] = await db.update(businesses).set({ description: typeof body.description === "string" ? body.description.slice(0, 5000) : undefined, address: typeof body.address === "string" ? requireText(body.address, "Address", 5, 1000) : undefined, defaultPickupNotes: typeof body.defaultPickupNotes === "string" ? body.defaultPickupNotes.slice(0, 2000) : undefined, updatedAt: new Date() }).where(eq(businesses.ownerId, user.id)).returning();
+      const [organization] = await db.update(businesses).set({ description: typeof body.description === "string" ? body.description.slice(0, 5000) : undefined, address: typeof body.address === "string" ? requireText(body.address, "Address", 5, 1000) : undefined, ...(typeof body.address === "string" ? geoFields(body.address) : {}), defaultPickupNotes: typeof body.defaultPickupNotes === "string" ? body.defaultPickupNotes.slice(0, 2000) : undefined, updatedAt: new Date() }).where(eq(businesses.ownerId, user.id)).returning();
       if (!organization) throw new ApiError("Business profile not found", 404);
     } else if (user.role === "NGO") {
       const capacity = body.maxCapacityKg == null ? undefined : requireNumber(body.maxCapacityKg, "Maximum capacity", 0.1, 10_000);
       const current = body.currentCapacityKg == null ? undefined : requireNumber(body.currentCapacityKg, "Current capacity", 0, capacity ?? 10_000);
-      const [organization] = await db.update(ngos).set({ requirementsText: typeof body.requirementsText === "string" ? body.requirementsText.slice(0, 5000) : undefined, address: typeof body.address === "string" ? requireText(body.address, "Address", 5, 1000) : undefined, maxCapacityKg: capacity, currentCapacityKg: current, maxTravelDistanceKm: body.maxTravelDistanceKm == null ? undefined : requireNumber(body.maxTravelDistanceKm, "Maximum travel distance", 1, 500), hasTransport: typeof body.hasTransport === "boolean" ? body.hasTransport : undefined, acceptsPartial: typeof body.acceptsPartial === "boolean" ? body.acceptsPartial : undefined, updatedAt: new Date() }).where(eq(ngos.ownerId, user.id)).returning();
+      const [organization] = await db.update(ngos).set({ requirementsText: typeof body.requirementsText === "string" ? body.requirementsText.slice(0, 5000) : undefined, address: typeof body.address === "string" ? requireText(body.address, "Address", 5, 1000) : undefined, ...(typeof body.address === "string" ? geoFields(body.address) : {}), maxCapacityKg: capacity, currentCapacityKg: current, maxTravelDistanceKm: body.maxTravelDistanceKm == null ? undefined : requireNumber(body.maxTravelDistanceKm, "Maximum travel distance", 1, 500), hasTransport: typeof body.hasTransport === "boolean" ? body.hasTransport : undefined, acceptsPartial: typeof body.acceptsPartial === "boolean" ? body.acceptsPartial : undefined, updatedAt: new Date() }).where(eq(ngos.ownerId, user.id)).returning();
       if (!organization) throw new ApiError("NGO profile not found", 404);
       if (Array.isArray(body.acceptedCategoryIds)) {
         const categoryIds = [...new Set(body.acceptedCategoryIds.filter((value): value is string => typeof value === "string"))];

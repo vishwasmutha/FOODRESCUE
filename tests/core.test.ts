@@ -115,3 +115,16 @@ test("verified compatible recipient ranks above ineligible recipient", () => {
   assert.equal(results[0].ngoId, "eligible");
   assert.equal(results[0].eligible, true);
 });
+
+test("pickup windows that cross midnight still overlap a 24-hour recipient", () => {
+  const donation: DonationForMatch = {
+    quantityKg: 10, categoryId: "c1", categoryName: "Cooked Meals", description: "rice", dietaryTags: ["VEGETARIAN"], storageCondition: null,
+    latitude: null, longitude: null, availableFrom: new Date(Date.now() + 10 * 60_000), pickupDeadline: new Date(Date.now() + 5 * 3_600_000), safetyReviewed: true,
+  };
+  const hub: NgoForMatch = {
+    id: "n1", name: "Hub", acceptedCategoryIds: ["c1"], acceptedCategoryNames: ["Cooked Meals"], requirementsText: "", dietaryPreferences: ["VEGETARIAN"], storageCapabilities: ["ANY"],
+    currentCapacityKg: 50, maxTravelDistanceKm: 20, hasTransport: true, acceptsPartial: true, verificationStatus: "VERIFIED", latitude: null, longitude: null, pickupWindowStart: "00:00", pickupWindowEnd: "23:59",
+  };
+  const [result] = rankNgoMatches(donation, [hub]);
+  assert.equal(result.eligible, true, result.rejectionReasons.join(" "));
+});
