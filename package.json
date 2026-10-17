@@ -10,7 +10,7 @@
     "test": "tsx --test tests/core.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx scripts/seed-demo.ts && tsx scripts/seed-extra.ts"
+    "db:seed": "tsx scripts/seed-demo.ts && tsx scripts/seed-extra.ts && tsx scripts/seed-fill.ts"
   },
   "dependencies": {
     "dotenv": "17.3.1",
